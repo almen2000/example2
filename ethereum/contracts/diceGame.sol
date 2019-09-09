@@ -1,41 +1,39 @@
 pragma solidity ^0.5.11;
 
 contract DiceGame {
-    address[] public players;
-    bytes32 public a = "18";
-    string public str;
-    bytes public byt;
-    mapping(address => bytes32) map;
+    address[] playersAddress;
+    uint8 public serverValue;
+    mapping(address => bytes32) players;
     
-    function hash() public view returns (bytes32) {
-        return keccak256("10");
+    modifier between1and12(uint value) {
+        require(value >= 1 && value <= 12, "The number is not from 1 to 12");
+        _;
     }
     
-    function g(bytes32 _a) public {
-        a=_a;
+    function setUserValueHash(bytes32 hashNumber) public {
+        address senderAddress = msg.sender;
+        require(players[senderAddress] == 0, "Player already bet number");
+        players[senderAddress] = hashNumber;
+        playersAddress.push(senderAddress);
     }
     
-    function f() public view returns (bytes memory) {
-        bytes memory b = abi.encode(16);
-        return b;
+    function setServerValue(uint8 dice) public between1and12(dice) {
+        serverValue = dice;
     }
     
-    function isValid(bytes memory number) public view returns (bool) {
-        if (keccak256(number) == keccak256("5")) {
-            a[1];
-            return true;
-        } else {
-            return false;
-        }
+    function checkUserValue(uint8 userValue) public view between1and12(userValue) returns (bool) {
+        require(userValue == serverValue, "User input does not match server value ");
+        bytes32 userHash = keccak256(abi.encode(userValue));
+        require(userHash == players[msg.sender], "User input does not match its hash");
+        return true;
     }
     
-    function isValid1(bytes32 hash) public view returns (bool) {
-        if (hash == keccak256("5")) {
-            return true;
-        } else {
-            return false;
-        }
+    function refreshPlayers() public returns (bool) {
+       uint length = playersAddress.length;
+       for (uint i = 0; i < length; i++) {
+           delete players[playersAddress[i]];
+       }
+       playersAddress.length = 0;
+       return true;
     }
-    
-
 }
