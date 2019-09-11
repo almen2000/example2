@@ -2,11 +2,13 @@ pragma solidity ^0.5.11;
 
 contract DiceGame {
     address public manager;
-    uint gameId = 0;
+    uint public minimumBet;
+    uint gameId;
     
     struct Player {
         bytes32 hashValue;
         uint betValue;
+        bool received;
     }
     struct Game {
         mapping(address => Player) players;
@@ -29,25 +31,41 @@ contract DiceGame {
         _;
     }
     
-    constructor() public {
+    constructor(uint _minimumBet) public {
         manager = msg.sender;
+        minimumBet = _minimumBet;
+        gameId = 0;
     }
     
     function setUserBetAndHash(bytes32 hashValue) public payable {
         address senderAddress = msg.sender;
+        require(senderAddress != manager, "Manager cannot bet a value");
         require(games[gameId].players[senderAddress].hashValue == 0, "Player already bet number");
+        require(msg.value > minimumBet, "You Bet less then minimumBet");
         games[gameId].players[senderAddress].hashValue = hashValue;
         games[gameId].players[senderAddress].betValue = msg.value;
         games[gameId].playerAddresses.push(senderAddress);
         games[gameId].gameBalance += msg.value;
     }
     
-    function checkUserValue(uint8 userValue, uint id) private view between1and12(userValue) returns (bool) {
-        require(id >= 0 && id < gameId, "Game is not ended");
-        require(userValue == games[id].winningValue, "User input does not match winning value");
+    function checkUserValue(uint8 userValue, uint _gameId) private view between1and12(userValue) returns (bool) {
+        require(!games[_gameId].players[msg.sender].received, "Player already receive a money");
+        require(_gameId >= 0 && _gameId < gameId, "Game is not ended");
+        require(userValue == games[_gameId].winningValue, "User input does not match winning value");
         bytes32 userHash = keccak256(abi.encode(userValue));
-        require(userHash == games[id].players[msg.sender].hashValue, "User input does not match its hash");
+        require(userHash == games[_gameId].players[msg.sender].hashValue, "User input does not match its hash");
         return true;
+    }
+    
+    function receiveMoney(uint8 userValue, uint _gameId) public payable returns (bool) {
+        if (checkUserValue(userValue, _gameId)) {
+            uint money = games[_gameId].players[msg.sender].betValue * games[_gameId].gameBalance / games[_gameId].allWinnersBalance;
+            msg.sender.transfer(money);
+            games[_gameId].restBalance -= money;
+            return true;
+        } else {
+            return false;
+        }
     }
     
     function setServerValue(uint8 dice) private between1and12(dice) {
@@ -69,14 +87,24 @@ contract DiceGame {
         games[gameId].restBalance = games[gameId].gameBalance;
     }
     
-    function newGame(uint8 dice) public isManager {
+    function startGame(uint8 dice) public isManager {
+        require(gameId == 0, "It is not start Game");
         setServerValue(dice);
-        setGame();
-        gameId++;
     }
     
-    function getGameById(uint id) public view returns(uint8, uint, uint, uint, uint) {
-        
+    function newGame(uint8 dice) public isManager {
+        require(gameId > 0, "The game did not start");
+        setGame();
+        gameId++;
+        setServerValue(dice);
+    }
+    
+    function getGameById(uint id) public view returns(uint8 winningValue, uint restBalance, uint gameBalance) {
+        return (
+            games[id].winningValue,
+            games[id].restBalance,
+            games[id].gameBalance
+        );
     }
     
     function getBalance() public view returns(uint) {

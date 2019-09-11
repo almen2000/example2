@@ -33,7 +33,7 @@ class HomaPage extends Component {
   render() {
     return (
       <Layout>
-        <div>{web3.utils.keccak256('0x' + leftPad((10).toString(16), 64, 0))}</div>
+        <div>{web3.utils.keccak256('0x' + leftPad((7).toString(16), 64, 0))}</div>
         <div>{web3.utils.keccak256('0x' + leftPad((11).toString(16), 64, 0))}</div>
         <div>{web3.utils.keccak256('0x' + leftPad((12).toString(16), 64, 0))}</div>
         <div>{web3.utils.keccak256('0x' + leftPad((13).toString(16), 64, 0))}</div>
