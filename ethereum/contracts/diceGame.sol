@@ -4,6 +4,7 @@ contract DiceGame {
     address public manager;
     uint public minimumBet;
     uint gameId;
+    bool gameStarted;
     
     struct Player {
         bytes32 hashValue;
@@ -88,12 +89,13 @@ contract DiceGame {
     }
     
     function startGame(uint8 dice) public isManager {
-        require(gameId == 0, "It is not start Game");
+        require(!gameStarted, "It is not start Game");
+        gameStarted = true;
         setServerValue(dice);
     }
     
     function newGame(uint8 dice) public isManager {
-        require(gameId > 0, "The game did not start");
+        require(gameStarted, "The game did not start");
         setGame();
         gameId++;
         setServerValue(dice);
@@ -107,8 +109,8 @@ contract DiceGame {
         );
     }
     
-    function getBalance() public view returns(uint) {
-        return address(this).balance;
-    }
+    // function getBalance() public view returns(uint) {
+    //     return address(this).balance;
+    // }
     
 }
