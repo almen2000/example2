@@ -2,7 +2,6 @@ pragma solidity ^0.5.11;
 
 contract DiceGame {
     address public manager;
-    uint public minimumBet;
     uint gameId;
     bool gameStarted;
     
@@ -19,6 +18,7 @@ contract DiceGame {
         uint allWinnersBalance;
         uint restBalance;
         uint gameBalance;
+        uint minimumBet;
     }
     mapping(uint => Game) games;
     
@@ -32,9 +32,8 @@ contract DiceGame {
         _;
     }
     
-    constructor(uint _minimumBet) public {
+    constructor() public {
         manager = msg.sender;
-        minimumBet = _minimumBet;
         gameId = 0;
     }
     
@@ -42,7 +41,7 @@ contract DiceGame {
         address senderAddress = msg.sender;
         require(senderAddress != manager, "Manager cannot bet a value");
         require(games[gameId].players[senderAddress].hashValue == 0, "Player already bet number");
-        require(msg.value > minimumBet, "You Bet less then minimumBet");
+        require(msg.value > games[gameId].minimumBet, "You Bet less then minimumBet");
         games[gameId].players[senderAddress].hashValue = hashValue;
         games[gameId].players[senderAddress].betValue = msg.value;
         games[gameId].playerAddresses.push(senderAddress);
@@ -88,24 +87,29 @@ contract DiceGame {
         games[gameId].restBalance = games[gameId].gameBalance;
     }
     
-    function startGame(uint8 dice) public isManager {
+    function startGame(uint8 dice, uint _minimumBet) public isManager returns (bool) {
         require(!gameStarted, "It is not start Game");
         gameStarted = true;
+        games[0].minimumBet = _minimumBet;
         setServerValue(dice);
+        return true;
     }
     
-    function newGame(uint8 dice) public isManager {
+    function newGame(uint8 dice, uint _minimumBet) public isManager returns (bool) {
         require(gameStarted, "The game did not start");
         setGame();
         gameId++;
+        games[gameId].minimumBet = _minimumBet;
         setServerValue(dice);
+        return true;
     }
     
-    function getGameById(uint id) public view returns(uint8 winningValue, uint restBalance, uint gameBalance) {
+    function getGameById(uint id) public view returns(uint8 winningValue, uint restBalance, uint gameBalance, uint minimumBet) {
         return (
             games[id].winningValue,
             games[id].restBalance,
-            games[id].gameBalance
+            games[id].gameBalance,
+            games[id].minimumBet
         );
     }
     

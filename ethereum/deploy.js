@@ -1,6 +1,6 @@
 const HDWalletProvider = require('truffle-hdwallet-provider');
 const Web3 = require('web3');
-const Altoken = require('./build/Altoken.json');
+const DiceGame = require('./build/DiceGame.json');
 
 const provider = new HDWalletProvider(
   'ride van lion tenant ivory diagram assume lazy tomato orphan proud oppose',
@@ -13,8 +13,8 @@ const deploy = async () => {
 
   console.log('Attempting to deploy from account', accounts[0]);
 
-  const result = await new web3.eth.Contract(JSON.parse(Altoken.interface))
-     .deploy({ data: '0x' + Altoken.bytecode }) // add 0x bytecode
+  const result = await new web3.eth.Contract(DiceGame.abi)
+     .deploy({ data: '0x' + DiceGame.evm.bytecode.object }) // add 0x bytecode
      .send({ from: accounts[0] }); // remove 'gas'
 
   console.log('Contract deployed to', result.options.address);
