@@ -2,8 +2,8 @@ pragma solidity ^0.5.11;
 
 contract DiceGame {
     address public manager;
-    uint gameId;
-    bool gameStarted;
+    uint public gameId;
+    bool public gameStarted;
     
     struct Player {
         bytes32 hashValue;
