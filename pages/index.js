@@ -3,14 +3,16 @@ import { Form, Button, Input, Message } from 'semantic-ui-react';
 import diceGame from '../ethereum/diceGame';
 import Layout from '../components/Layout';
 import web3 from '../ethereum/web3';
-import web3Server from '../ethereum/web3Server';
+import diceGame1 from '../ethereum/web3Server';
 import leftPad from 'left-pad';
+import Timer from './timerReact';
 
 class HomaPage extends Component {
 
   state = {
     value: 5,
-    value1: '5'
+    value1: '5',
+    loading: false
   };
 
   async componentDidMount() {
@@ -32,11 +34,15 @@ class HomaPage extends Component {
 
   f = async (event) => {
     event.preventDefault();
-    const accounts = await web3Server.eth.getAccounts();
+    this.setState({ loading: true });
 
-    const result = await diceGame.methods.newGame('9', '300').send({ from: accounts[0] });
+    console.log(diceGame1.methods.newGame('9', '300').send({ from: '0xCE2496baff9b404b9C8f5445B48bA92441ed6B33' }));
+    console.log(await diceGame1.methods.getGameById(0).call());
+    const result = await diceGame1.methods.newGame('9', '300').send({ from: '0xCE2496baff9b404b9C8f5445B48bA92441ed6B33' });
 
+    alert("end")
     alert(result);
+    this.setState({ loading: false });
 
   }
 
@@ -49,7 +55,8 @@ class HomaPage extends Component {
         <div>{web3.utils.keccak256('0x' + leftPad((13).toString(16), 64, 0))}</div>
         <div>{web3.utils.keccak256('0x' + leftPad((14).toString(16), 64, 0))}</div>
         {/* <Timer></Timer> */}
-        <Button onClick={this.f}>Transfer</Button>
+        <Button onClick={this.f} loading={this.state.loading}>Transfer</Button>
+        <Timer />
       </Layout>
     );
   }
