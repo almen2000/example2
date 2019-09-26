@@ -11,5 +11,5 @@ let managerAccount = web3.eth.accounts.privateKeyToAccount(privatKey);
 const transaction = {
     from: managerAccount.address,
     gas: 300000,
-    data: 
+    data: 1
 }

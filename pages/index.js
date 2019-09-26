@@ -3,15 +3,10 @@ import { Form, Button, Input, Message } from 'semantic-ui-react';
 import diceGame from '../ethereum/diceGame';
 import Layout from '../components/Layout';
 import web3 from '../ethereum/web3';
-<<<<<<< HEAD
 // import web3Server from '../ethereum/web3Server';
 import leftPad from 'left-pad';
 import Timer from './timer';
-=======
-import diceGame1 from '../ethereum/web3Server';
-import leftPad from 'left-pad';
-import Timer from './timerReact';
->>>>>>> 82640e09d4549bc52ed2a2ad9a9e85fd66ac1c62
+import setNewGame from './example2';
 
 class HomaPage extends Component {
 
@@ -40,20 +35,21 @@ class HomaPage extends Component {
 
   f = async (event) => {
     event.preventDefault();
-<<<<<<< HEAD
     const accounts = await web3.eth.getAccounts();
-=======
-    this.setState({ loading: true });
->>>>>>> 82640e09d4549bc52ed2a2ad9a9e85fd66ac1c62
 
-    console.log(diceGame1.methods.newGame('9', '300').send({ from: '0xCE2496baff9b404b9C8f5445B48bA92441ed6B33' }));
-    console.log(await diceGame1.methods.getGameById(0).call());
-    const result = await diceGame1.methods.newGame('9', '300').send({ from: '0xCE2496baff9b404b9C8f5445B48bA92441ed6B33' });
+    const result = await diceGame.methods.newGame('9', '300').send({ from: accounts[0] });
 
-    alert("end")
     alert(result);
-    this.setState({ loading: false });
 
+  }
+
+  newGame = async (event) => {
+    event.preventDefault();
+    this.setState({ loading: true });
+    
+    await setNewGame('10', '11');
+
+    this.setState({ loading: false });
   }
 
   render() {
@@ -65,13 +61,8 @@ class HomaPage extends Component {
         <div>{web3.utils.keccak256('0x' + leftPad((13).toString(16), 64, 0))}</div>
         <div>{web3.utils.keccak256('0x' + leftPad((14).toString(16), 64, 0))}</div>
         {/* <Timer></Timer> */}
-<<<<<<< HEAD
-        <Button onClick={this.f}>Transfer</Button>
-        <Timer></Timer>
-=======
-        <Button onClick={this.f} loading={this.state.loading}>Transfer</Button>
-        <Timer />
->>>>>>> 82640e09d4549bc52ed2a2ad9a9e85fd66ac1c62
+        <Button onClick={this.newGame} loading={this.state.loading}>New Game</Button>
+        {/* <Timer></Timer> */}
       </Layout>
     );
   }

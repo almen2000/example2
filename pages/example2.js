@@ -1,5 +1,5 @@
 import Web3, { providers } from 'web3';
-import DiceGame from './build/DiceGame.json';
+import DiceGame from '../ethereum/build/DiceGame.json';
 
 let provider = new providers.HttpProvider('https://rinkeby.infura.io/v3/a8bc12d19ee2426eba8ab41aedce8f10');
 
@@ -14,8 +14,10 @@ let contract = new web3.eth.Contract(
 const newGame = async (dice, minimumBet) => {
     if (dice < 1 || dice > 12 || isNaN(minimumBet)) return false;
     const tr = contract.methods.newGame(dice, minimumBet);
+    console.log('method is ', tr);
+    const addressTo = '0xB1a6A24Ea7427f3f09CBB43Fb3b5d3d9930d304D';
 
-    
+    return await signAndSendTransaction(privatKey, addressTo, tr.encodeABI(), 300000);
 }
 
 const signAndSendTransaction = async (senderPrivateKey, to, encodeABI, gas) => {
@@ -34,9 +36,13 @@ const signAndSendTransaction = async (senderPrivateKey, to, encodeABI, gas) => {
     }
 
     let signed = await web3.eth.accounts.signTransaction(transaction, pk);
+    console.log('signed is ', signed);
     let trn = await web3.eth.sendSignedTransaction(signed.rawTransaction);
-    return true;
+    console.log('trn is ', trn);
+    return trn;
 }
+
+export default newGame;
 
 
 
