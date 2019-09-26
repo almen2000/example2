@@ -3,8 +3,9 @@ import { Form, Button, Input, Message } from 'semantic-ui-react';
 import diceGame from '../ethereum/diceGame';
 import Layout from '../components/Layout';
 import web3 from '../ethereum/web3';
-import web3Server from '../ethereum/web3Server';
+// import web3Server from '../ethereum/web3Server';
 import leftPad from 'left-pad';
+import Timer from './timer';
 
 class HomaPage extends Component {
 
@@ -32,7 +33,7 @@ class HomaPage extends Component {
 
   f = async (event) => {
     event.preventDefault();
-    const accounts = await web3Server.eth.getAccounts();
+    const accounts = await web3.eth.getAccounts();
 
     const result = await diceGame.methods.newGame('9', '300').send({ from: accounts[0] });
 
@@ -50,6 +51,7 @@ class HomaPage extends Component {
         <div>{web3.utils.keccak256('0x' + leftPad((14).toString(16), 64, 0))}</div>
         {/* <Timer></Timer> */}
         <Button onClick={this.f}>Transfer</Button>
+        <Timer></Timer>
       </Layout>
     );
   }
